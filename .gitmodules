@@ -1,0 +1,6 @@
+[submodule "external/meshtastic-firmware"]
+	path = external/meshtastic-firmware
+	url = https://github.com/meshtastic/firmware.git
+[submodule "external/meshcore"]
+	path = external/meshcore
+	url = https://github.com/meshcore-dev/MeshCore.git

@@ -1,0 +1,12 @@
+.pio/
+.vscode/
+build/
+dist/
+*.bin
+*.elf
+*.hex
+*.map
+*.log
+*.tmp
+artifacts/*.json
+

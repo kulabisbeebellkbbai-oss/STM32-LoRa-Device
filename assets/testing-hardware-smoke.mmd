@@ -1,0 +1,22 @@
+flowchart LR
+  A["Stage A\nUSB/Boot"] --> B["Stage B\nDisplay + Radio bus"]
+  B --> C["Stage C\nI2C sensors + DHT"]
+  C --> D["Stage D\nGPS NMEA"]
+  D --> E["Stage E\nRF local smoke"]
+  E --> F["Stage F\nControls UX"]
+  F --> G["Stage G\nPower stress (USB)"]
+  G --> H["Gate: go/no-go for battery/prod"]
+
+  B -->|Fail| Bx["Resolve CS timing and pull-up/power faults"]
+  C -->|Fail| Cx["Verify I2C address and pull-ups"]
+  D -->|Fail| Dx["Verify UART level and baud"]
+  E -->|Fail| Ex["Reduce TX power, check legal/antenna/path"]
+  F -->|Fail| Fx["Tune input debounce/ISR mapping"]
+  H -->|Fail| Hx["Pause and document"]
+
+  Bx --> B
+  Cx --> C
+  Dx --> D
+  Ex --> E
+  Fx --> F
+  Hx --> G

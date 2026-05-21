@@ -1,0 +1,30 @@
+digraph PowerRails {
+  rankdir=LR;
+  node [shape=box, style=rounded];
+
+  USB5V [label="USB 5 V / bench supply"];
+  LDO [label="3V3 LDO or regulator path"];
+  MCU3V3 [label="STM32WB55CGU6\n3V3 rail"];
+  BOOST [label="MT3608 boost\n(5 V out, optional)"];
+  ST7789 [label="ST7789 module"];
+  DXLR03 [label="DX-LR03-900T22D\nLoRa UART module"];
+  BMP [label="BMP280"];
+  ADXL [label="ADXL345"];
+  DHT [label="DHT11"];
+  GPS [label="GY-NEO6MV2"];
+  Display [label="UI peripherals"];
+
+  USB5V -> LDO;
+  LDO -> MCU3V3 [label="3.3 V"];
+  MCU3V3 -> ST7789 [label="3.3 V"];
+  USB5V -> DXLR03 [label="5 V"];
+  MCU3V3 -> DXLR03 [label="3.3 V IO"];
+  MCU3V3 -> BMP [label="3.3 V"];
+  MCU3V3 -> ADXL [label="3.3 V"];
+  MCU3V3 -> DHT [label="3.3 V"];
+  MCU3V3 -> GPS [label="3.3 V"];
+  MCU3V3 -> Display [label="3.3 V logic"];
+  USB5V -> BOOST [style=dashed, label="optional battery path"];
+  BOOST -> Display [style=dashed, label="5 V optional"];
+  Display -> ST7789;
+}

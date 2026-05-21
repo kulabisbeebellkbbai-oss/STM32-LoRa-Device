@@ -1,0 +1,43 @@
+input_c_escape	expected_command	notes
+help	Help	no argument command
+help extra	Unknown	extra command token rejected
+apps	Apps	list supported app profiles
+app	App	app selection/query
+app standalone	App	standalone selection via app alias
+app lorawan	App	lorawan selection mode argument parsed
+app lorawan extra	Unknown	extra app argument rejected
+app unknown	Unknown	invalid app mode argument rejected
+status	Status	no argument command
+status\t	Status	trailing tab delimiter accepted
+messages	Messages	no argument command
+mode	Mode	print current mode and usage
+mode lorawan	Mode	set LoRaWAN mode
+mode\tlorawan	Mode	tab delimiter accepted
+mode lorawan extra	Unknown	extra argument rejected
+mode unknown	Unknown	invalid mode argument rejected
+CONFIG	Config	command is case-insensitive
+telemetry	Telemetry	print latest telemetry
+apps	Apps	list supported app profiles
+profile	Profile	no argument command for profile surface
+profile export	ProfileExport	produce all-profiles schema output
+profile export lorawan	ProfileExport	export lorawan profile schema
+profile export lorawan extra	Unknown	extra profile export argument rejected
+profile import	ProfileImport	request import without payload shows usage
+profile import test_payload	ProfileImport	import payload accepted and echoed as raw argument
+profile bad	Unknown	unknown profile subcommand rejected
+display	Display	print display diagnostics
+modem	Modem	show modem interface contract
+modem status	ModemStatus	show modem status from contract view
+modem contract	ModemContract	show modem contract schema
+modem bad	Unknown	unknown modem subcommand rejected
+radio help	RadioHelp	report deferred radio help query
+radio config	RadioConfig	report deferred radio configuration query
+radio	Radio	print radio diagnostics
+radio at	RadioAt	report deferred AT probe without queuing writes
+sensors	Sensors	print sensor and GPS diagnostics
+i2cscan	I2cScan	run compile-gated I2C scan path
+config	Config	print regulatory profile/signoff and tx lock status
+config signoff	ConfigSignoff	request placeholder signoff acknowledgement
+pins	Pins	print input and keypad diagnostics
+version	Version	print firmware version
+unknown	Unknown	unknown token reported

@@ -1,0 +1,58 @@
+flowchart LR
+  subgraph MCU["STM32WB55CGU6"]
+    direction TB
+    SPI["SPI1 shared bus"]
+    I2C["I2C1"]
+    UART["USART1"]
+    ENC["Encoder/Buttons"]
+  end
+
+  subgraph SPI_Devices["SPI1 devices"]
+    DISP["ST7789 Display"]
+  end
+
+  subgraph Radio["UART radio"]
+    LRM["DX-LR03-900T22D"]
+  end
+
+  subgraph Sensors["Sensors"]
+    BMP["BMP280"]
+    ADX["ADXL345"]
+    DHT["DHT11"]
+  end
+
+  subgraph Comm["GPS"]
+    GPS["GY-NEO6MV2"]
+  end
+
+  subgraph UI["UI Controls"]
+    BTN["Back/Home + Toggles + Keypad"]
+  end
+
+  SPI -->|SCK/MOSI| DISP
+  MCU -->|LPUART1 TX/RX + GPIO| LRM
+  I2C -->|SCL/SDA| BMP
+  I2C -->|SCL/SDA| ADX
+  MCU -->|GPIO| DHT
+  UART -->|TX/RX| GPS
+  ENC -->|GPIO IRQ| BTN
+
+  LRM -.->|PA2| "RXD"
+  LRM -.->|PA3| "TXD"
+  LRM -.->|PB0| "M0"
+  LRM -.->|PB1| "M1"
+  LRM -.->|PA15| "AUX"
+
+  DISP -.->|PA4| "CS"
+  DISP -.->|PB4| "DC"
+  DISP -.->|PB5| "RST"
+  DISP -.->|PA8| "BL"
+
+  BMP -.->|PB9| "SDA"
+  BMP -.->|PB8| "SCL"
+  ADX -.->|PB9| "SDA"
+  ADX -.->|PB8| "SCL"
+  DHT -.->|PB2| "DHT DATA"
+
+  GPS -.->|PB7| "TX"
+  GPS -.->|PB6| "RX"

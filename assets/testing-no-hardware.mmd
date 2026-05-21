@@ -1,0 +1,10 @@
+flowchart TB
+  S0["No-hardware validation"] --> S1["`pio run` passes"]
+  S1 --> S2["Review docs (pin-plan, regional caveats, flash prep)"]
+  S2 --> S3["Static schematic checks (pins, rails, power order)"]
+  S3 --> S4["No-hardware test artifacts updated in tests/README.md"]
+  S4 --> S5{"Any risk item unresolved?"}
+  S5 -- Yes --> S6["Create/assign follow-up before hardware touch"]
+  S5 -- No --> S7["Approve for first hardware wiring stage"]
+  S6 --> END1["Hold hardware task"]
+  S7 --> END2["Proceed to stage-A build smoke check"]

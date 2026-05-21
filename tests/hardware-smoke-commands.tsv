@@ -1,0 +1,12 @@
+# command	expected_substring	timeout_seconds
+help	commands:	3
+status	status mode=	4
+modem status	modem status surface	3
+modem contract	modem_contract profile=v1	3
+version	firmware_name=	3
+config	config profile=	3
+radio	radio initialized=	3
+app	surface=app_profiles	3
+pins	pins encoderA=	3
+telemetry	telemetry seq=	3
+radio at	no AT write queued	4

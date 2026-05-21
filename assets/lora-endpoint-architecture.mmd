@@ -1,0 +1,19 @@
+flowchart LR
+  M[STM32WB55CGU6\nweact_wb55cgu6]
+  P1[DX-LR03-900T22D\nUART AT modem]
+  P2[ST7789 TFT\nSPI1]
+  S1[BMP280\nI2C1]
+  S2[ADXL345\nI2C1]
+  S3[DHT11\nGPIO]
+  G1[GY-NEO6MV2\nUART]
+  C1[Encoder / Buttons / Toggles]
+
+  M -->|"LPUART1: TX/RX"| P1
+  M -->|"GPIO: M0/M1/AUX"| P1
+  M -->|"SPI1: SCK, MOSI"| P2
+  M -->|"SPI1 CS/CTRL"| P2
+  M -->|"I2C1"| S1
+  M -->|"I2C1"| S2
+  M -->|"GPIO"| S3
+  M -->|"UART1 RX/TX"| G1
+  M -->|"GPIO IRQ"| C1
