@@ -9,6 +9,8 @@ Use this for future manager-thread sessions that coordinate multiple assistants.
 - Assign ownership by component surface (`src/`, `include/`, `docs/`, `tests/`, `platformio.ini`) and never mix unrelated areas in one subagent handoff unless necessary.
 - Use short check-ins every turn: what changed, what still open, next action in 1 line.
 - When hardware is not present, implement all hardware-facing firmware, docs, diagrams, gates, and simulation assets as far as possible before stopping for physical bring-up.
+- When asked to set up or prepare a new project, create or connect the GitHub repository during project setup, then push the initial committed baseline before treating setup as complete.
+- When the user asks to create a branch, create and switch to that branch immediately before doing branch-scoped work.
 
 ## 2) Subagent role/model routing
 - Route by task, not by person:
