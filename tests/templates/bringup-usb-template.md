@@ -29,8 +29,8 @@ Use this template for `Stage 1` USB-only baseline from
 - [ ] `help` output lists core command set from baseline firmware
 - [ ] `telemetry` cadence present (~5000 ms)
 - [ ] `DISPLAY(STUB):` cadence present (~3000 ms)
-- [ ] `status mode=` cadence present (~10000 ms)
-- [ ] `radio(stub) simulated_tx` cadence present (~15000 ms) in baseline run
+- [ ] `status firmware_name=` cadence present (~10000 ms), including `mode=`
+- [ ] RF policy guard log present; no over-the-air transmit is attempted
 - [ ] No `assert` tokens in logs over first 3 full cycles
 - [ ] No `No boot banner` within 10 s after upload
 
