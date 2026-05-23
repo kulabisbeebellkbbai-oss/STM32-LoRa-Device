@@ -1,6 +1,6 @@
 # command	expected_substring	timeout_seconds
 help	commands:	3
-status	status mode=	4
+status	status firmware_name=	4
 modem status	modem status surface	3
 modem contract	modem_contract profile=v1	3
 version	firmware_name=	3
