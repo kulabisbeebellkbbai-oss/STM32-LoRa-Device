@@ -9,4 +9,5 @@ dist/
 *.log
 *.tmp
 artifacts/*.json
-
+tests/build/
+tests/results/

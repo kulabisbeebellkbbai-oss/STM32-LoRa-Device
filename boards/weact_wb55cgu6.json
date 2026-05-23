@@ -23,7 +23,7 @@
       "stlink"
     ],
     "jlink_device": "STM32WB55xx",
-    "openocd_target": "stm32wbx.cfg",
+    "openocd_target": "stm32wbx",
     "onboard_tools": [],
     "svd_path": "STM32WB55_CM4.svd"
   },
