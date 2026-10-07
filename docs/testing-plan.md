@@ -133,6 +133,9 @@ frequency approval.
 1. Verify serial `radio` diagnostics before RF hardware tests:
    - `pinsConfigured`, `dxLr03CompileEnabled`, `serialInitialized`,
      `moduleInitAttempted`, `moduleProbePassed`, `serialBaud`, `transmitGuarded`
+   - for RFM69H builds, `rfm69hCompileEnabled`, `rfm69hProfile`,
+     `rfm69hFrequencyHz`, `rfm69hSpiInitialized`, `rfm69hVersion`, and
+     `transmitGuarded`
    - `moduleProbePassed=no` is expected in the current firmware. The `radio at`
      command is intentionally deferred and should report `no AT write queued`
      until the DX-LR03 command-mode probe is explicitly enabled after hardware
@@ -144,10 +147,15 @@ frequency approval.
      command-mode probe is enabled in firmware.
    - confirm firmware reports UART modem pins and control pins before hardware
      validation checks electrical levels.
-2. Point-to-point loopback with nearest lab-range peers only.
-3. Keep power and duty cycle in the lowest safe test profile.
-4. Confirm packet counter and retries in the local UI.
-5. Stop after first successful end-to-end exchange.
+2. Build both inventory-backed RFM69H profiles before wiring either module:
+   - `pio run -e stm32wb55_rfm69h_868`
+   - `pio run -e stm32wb55_rfm69h_915`
+3. After flashing an RFM69H build, run:
+   - `scripts/hardware-smoke.sh --port <port> --commands tests/rfm69h-radio-commands.tsv`
+4. Point-to-point loopback with nearest lab-range peers only.
+5. Keep power and duty cycle in the lowest safe test profile.
+6. Confirm packet counter and retries in the local UI.
+7. Stop after first successful end-to-end exchange.
 
 ### Stage F — Controls
 

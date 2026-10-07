@@ -1,5 +1,6 @@
 #include "radio_service.h"
 #include "device_config.h"
+#include <SPI.h>
 #include <cstring>
 
 namespace {
@@ -9,6 +10,10 @@ constexpr size_t kAtCommandMaxLen = 32;
 constexpr size_t kLastTxDenyReasonBytes = sizeof(RadioStatus::lastTxDenyReason);
 
 constexpr char kAtProbeCommand[] = "AT\r\n";
+constexpr uint32_t kRfm69h868FrequencyHz = 868000000UL;
+constexpr uint32_t kRfm69h915FrequencyHz = 915000000UL;
+constexpr uint8_t kRfm69hRegVersion = 0x10;
+constexpr uint8_t kRfm69hExpectedVersion = 0x24;
 
 #if defined(LORA_RADIO_DX_LR03_SERIAL) && !defined(RENODE_SIMULATION)
 HardwareSerial dxLr03Serial(lora_device::PinConfig::kRadioUartRx,
@@ -41,6 +46,18 @@ void clearReasonBuffer(char *reason, size_t reasonLength) {
     reason[0] = '\0';
   }
 }
+
+#if defined(LORA_RADIO_RFM69H_SPI) && !defined(RENODE_SIMULATION)
+uint8_t readRfm69hRegister(uint8_t address) {
+  SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
+  digitalWrite(lora_device::PinConfig::kRfm69hChipSelect, LOW);
+  SPI.transfer(address & 0x7F);
+  const uint8_t value = SPI.transfer(0x00);
+  digitalWrite(lora_device::PinConfig::kRfm69hChipSelect, HIGH);
+  SPI.endTransaction();
+  return value;
+}
+#endif
 }  // namespace
 
 
@@ -64,12 +81,26 @@ void RadioService::begin(AppMode mode) {
 #if defined(LORA_RADIO_DX_LR03_SERIAL)
   radioStatus.dxLr03CompileEnabled = true;
 #endif
+#if defined(LORA_RADIO_RFM69H_SPI)
+  radioStatus.rfm69hCompileEnabled = true;
+  #if defined(LORA_RADIO_RFM69H_868)
+  radioStatus.rfm69h868Profile = true;
+  radioStatus.rfm69hFrequencyHz = kRfm69h868FrequencyHz;
+  #elif defined(LORA_RADIO_RFM69H_915)
+  radioStatus.rfm69h915Profile = true;
+  radioStatus.rfm69hFrequencyHz = kRfm69h915FrequencyHz;
+  #else
+  radioStatus.rfm69hFrequencyHz = 0;
+  #endif
+#endif
   beginHardware();
 
   LORA_DEVICE_CONSOLE.print(F("radio init mode="));
   LORA_DEVICE_CONSOLE.print(appModeName(mode));
   if (radioStatus.serialInitialized) {
     LORA_DEVICE_CONSOLE.println(F(" dx-lr03 serial module initialized; TX guarded"));
+  } else if (radioStatus.rfm69hSpiInitialized) {
+    LORA_DEVICE_CONSOLE.println(F(" rfm69h spi scaffold initialized; TX guarded"));
   } else {
     LORA_DEVICE_CONSOLE.println(F(" diagnostic/stub mode; no RF transmit path enabled"));
   }
@@ -81,6 +112,16 @@ void RadioService::configurePins() {
 }
 
 void RadioService::configureRadioPins() {
+#if defined(LORA_RADIO_RFM69H_SPI) && !defined(RENODE_SIMULATION)
+  digitalWrite(lora_device::PinConfig::kRfm69hChipSelect, HIGH);
+  digitalWrite(lora_device::PinConfig::kRfm69hReset, LOW);
+  pinMode(lora_device::PinConfig::kRfm69hChipSelect, OUTPUT);
+  pinMode(lora_device::PinConfig::kRfm69hReset, OUTPUT);
+  pinMode(lora_device::PinConfig::kRfm69hDio0, INPUT_PULLDOWN);
+  digitalWrite(lora_device::PinConfig::kRfm69hChipSelect, HIGH);
+  digitalWrite(lora_device::PinConfig::kRfm69hReset, LOW);
+  return;
+#endif
   digitalWrite(lora_device::PinConfig::kRadioSleepControl, HIGH);
   digitalWrite(lora_device::PinConfig::kRadioModeControl, LOW);
   pinMode(lora_device::PinConfig::kRadioSleepControl, OUTPUT);
@@ -89,6 +130,30 @@ void RadioService::configureRadioPins() {
 }
 
 void RadioService::beginHardware() {
+#if defined(LORA_RADIO_RFM69H_SPI) && !defined(RENODE_SIMULATION)
+  if (!hardwareAvailable) {
+    LORA_DEVICE_CONSOLE.println(F("radio: RFM69H SPI compile-time path enabled; hardware availability flag is off"));
+    return;
+  }
+
+  radioStatus.moduleInitAttempted = true;
+  digitalWrite(lora_device::PinConfig::kRfm69hReset, HIGH);
+  delay(2);
+  digitalWrite(lora_device::PinConfig::kRfm69hReset, LOW);
+  delay(5);
+  SPI.begin();
+  radioStatus.rfm69hSpiInitialized = true;
+  radioStatus.rfm69hVersionRegister = readRfm69hRegister(kRfm69hRegVersion);
+  radioStatus.moduleProbePassed = radioStatus.rfm69hVersionRegister == kRfm69hExpectedVersion;
+  radioStatus.available = false;
+  radioStatus.mocked = true;
+  if (radioStatus.moduleProbePassed) {
+    LORA_DEVICE_CONSOLE.println(F("radio: RFM69H SPI register probe passed; TX guarded"));
+  } else {
+    LORA_DEVICE_CONSOLE.println(F("radio: RFM69H SPI ready; version probe did not pass; TX guarded"));
+  }
+  return;
+#endif
 #if defined(LORA_RADIO_DX_LR03_SERIAL) && !defined(RENODE_SIMULATION)
   if (!hardwareAvailable) {
     LORA_DEVICE_CONSOLE.println(F("radio: DX-LR03 serial compile-time path enabled; hardware availability flag is off"));
@@ -107,7 +172,7 @@ void RadioService::beginHardware() {
     LORA_DEVICE_CONSOLE.println(F("radio: DX-LR03 UART init not available"));
   }
 #else
-  LORA_DEVICE_CONSOLE.println(F("radio: DX-LR03 compile-time path not enabled"));
+  LORA_DEVICE_CONSOLE.println(F("radio: hardware radio compile-time path not enabled"));
 #endif
 }
 
@@ -152,6 +217,11 @@ void RadioService::beginSerialModule() {
 }
 
 void RadioService::sampleAux() {
+#if defined(LORA_RADIO_RFM69H_SPI) && !defined(RENODE_SIMULATION)
+  radioStatus.auxBusy = false;
+  radioStatus.isBusy = false;
+  return;
+#endif
 #if defined(LORA_RADIO_DX_LR03_SERIAL) && !defined(RENODE_SIMULATION)
   if (!radioStatus.serialInitialized) {
     radioStatus.auxBusy = false;
@@ -228,6 +298,25 @@ void RadioService::printStatus(Print &out) const {
   out.print(radioStatus.pinsConfigured ? F("yes") : F("no"));
   out.print(F(" dxLr03CompileEnabled="));
   out.print(radioStatus.dxLr03CompileEnabled ? F("yes") : F("no"));
+  out.print(F(" rfm69hCompileEnabled="));
+  out.print(radioStatus.rfm69hCompileEnabled ? F("yes") : F("no"));
+  out.print(F(" rfm69hProfile="));
+  if (radioStatus.rfm69h868Profile) {
+    out.print(F("868MHz"));
+  } else if (radioStatus.rfm69h915Profile) {
+    out.print(F("915MHz"));
+  } else {
+    out.print(F("none"));
+  }
+  out.print(F(" rfm69hFrequencyHz="));
+  out.print(radioStatus.rfm69hFrequencyHz);
+  out.print(F(" rfm69hSpiInitialized="));
+  out.print(radioStatus.rfm69hSpiInitialized ? F("yes") : F("no"));
+  out.print(F(" rfm69hVersion=0x"));
+  if (radioStatus.rfm69hVersionRegister < 0x10) {
+    out.print(F("0"));
+  }
+  out.print(radioStatus.rfm69hVersionRegister, HEX);
   out.print(F(" serialInitialized="));
   out.print(radioStatus.serialInitialized ? F("yes") : F("no"));
   out.print(F(" moduleInitAttempted="));
@@ -285,6 +374,18 @@ void RadioService::printStatus(Print &out) const {
   out.print(lora_device::PinConfig::kRadioSleepControl);
   out.print(F(" m0="));
   out.print(lora_device::PinConfig::kRadioModeControl);
+  out.print(F(" rfm_sck="));
+  out.print(lora_device::PinConfig::kRfm69hSpiSck);
+  out.print(F(" rfm_mosi="));
+  out.print(lora_device::PinConfig::kRfm69hSpiMosi);
+  out.print(F(" rfm_miso="));
+  out.print(lora_device::PinConfig::kRfm69hSpiMiso);
+  out.print(F(" rfm_cs="));
+  out.print(lora_device::PinConfig::kRfm69hChipSelect);
+  out.print(F(" rfm_rst="));
+  out.print(lora_device::PinConfig::kRfm69hReset);
+  out.print(F(" rfm_dio0="));
+  out.print(lora_device::PinConfig::kRfm69hDio0);
   out.println();
 }
 

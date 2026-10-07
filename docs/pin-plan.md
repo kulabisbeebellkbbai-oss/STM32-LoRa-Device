@@ -29,6 +29,12 @@ and intentionally avoids native USB pins (`PA11`/`PA12`) and SWD pins
 | Radio | `PB0` | DX-LR03 `M0` | MCU out | Reserved/custom mode control if fitted; default low in firmware. |
 | Radio | `PB1` | DX-LR03 `M1` | MCU out | Sleep/wake control from vendor docs; firmware drives high/wake. |
 | Radio | `PA15` | DX-LR03 `AUX` | Peripheral in | Module busy/tx/rx status |
+| Alt radio | `PB3` (SPI1_SCK) | RFM69H `SCK` | MCU out | Alternative SPI radio path; shared with display clock. |
+| Alt radio | `PA7` (SPI1_MOSI) | RFM69H `MOSI` | MCU out | Alternative SPI radio path; shared with display MOSI. |
+| Alt radio | `PA6` (SPI1_MISO) | RFM69H `MISO` | Peripheral in | Conflicts with encoder switch in v0.1; defer encoder switch or move it when RFM69H is fitted. |
+| Alt radio | `PA15` (SPI1_SS1) | RFM69H `NSS` / `CS` | MCU out | Mutually exclusive with DX-LR03 `AUX`. |
+| Alt radio | `PB0` | RFM69H `RESET` | MCU out | Active high reset; firmware idles low after pulse. Mutually exclusive with DX-LR03 `M0`. |
+| Alt radio | `PB1` | RFM69H `DIO0` | Peripheral in | Mutually exclusive with DX-LR03 `M1`; first IRQ/status line. |
 | Display | `PA4` (SPI1_CS) | ST7789 `CS` | MCU out | Keep high during display idle states |
 | Display | `PB4` | ST7789 `DC` | MCU out | Data/command select |
 | Display | `PB5` | ST7789 `RST` | MCU out | Active low |
@@ -48,13 +54,16 @@ and intentionally avoids native USB pins (`PA11`/`PA12`) and SWD pins
 | USB | USB D+/D- (native) | Host / serial bring-up | MCU/USB peripheral | Keep enabled for logs |
 
 `PB6`/`PB7` are reserved for GPS `Serial1`. `PA2`/`PA3` are assigned to the
-DX-LR03 UART link and must stay clear of existing control signals.
+DX-LR03 UART link and must stay clear of existing control signals when that
+module is fitted.
 
 ## Shared-Bus Constraint
 
-The ST7789 display uses SPI1 exclusively. The radio is now UART-based, so there
-is no SPI bus arbitration between radio and display; keep both paths on short,
-well-terminated leads and check startup timing once the module is attached.
+The ST7789 display uses SPI1. The DX-LR03 radio path is UART-based, so there is
+no SPI bus arbitration for that module. The inventory RFM69H modules are
+alternative SPI radios; if one is fitted, it shares SPI1 SCK/MOSI with the
+display, adds MISO on `PA6`, and uses separate chip-select/control pins. Keep
+only one radio family fitted during first bring-up.
 
 ## Pin Plan Risk Log
 

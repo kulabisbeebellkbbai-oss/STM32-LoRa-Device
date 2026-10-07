@@ -46,8 +46,10 @@ AppProfileRegistry::SelectionInfo AppProfileRegistry::selectionInfo(
   if (profile.requiresRadio && !context.radioStatus.initialized) {
     return {false, "radio subsystem not initialized"};
   }
-  if (profile.requiresRadio && !context.radioStatus.serialInitialized) {
-    return {false, "radio serial not initialized"};
+  if (profile.requiresRadio &&
+      !context.radioStatus.serialInitialized &&
+      !context.radioStatus.rfm69hSpiInitialized) {
+    return {false, "radio physical interface not initialized"};
   }
   if (profile.requiresRadio && !context.radioStatus.moduleInitAttempted) {
     return {false, "radio hardware validation has not started"};

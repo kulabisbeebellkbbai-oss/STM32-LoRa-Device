@@ -1,0 +1,14 @@
+# command	expected_substring	timeout_seconds
+help	commands:	3
+status	status firmware_name=	4
+version	firmware_name=	3
+display	display diagnostics surface	4
+display	display enabled=	4
+sensors	sensor ready=	4
+sensors	stubOnly=	4
+i2cscan	i2cScan compile=	4
+radio	radio initialized=	4
+radio	transmitGuarded=yes	4
+config	config profile=	4
+pins	pins encoderA=	4
+telemetry	telemetry seq=	4

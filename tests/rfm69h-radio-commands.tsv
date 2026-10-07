@@ -1,0 +1,6 @@
+# command	expected_substring	timeout_seconds
+radio	rfm69hCompileEnabled=yes	4
+radio	rfm69hFrequencyHz=	4
+radio	rfm69hSpiInitialized=	4
+radio	rfm69hVersion=0x	4
+radio	transmitGuarded=yes	4

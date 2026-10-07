@@ -16,7 +16,9 @@ Use this template for `Stage 1` USB-only baseline from
 
 - [ ] `pio run`
 - [ ] `pio run -t upload` (or environment-specific upload command)
-- [ ] `pio device monitor`
+- [ ] Boot-banner capture run with no other serial monitor open:
+  `scripts/capture-boot-log.sh --output <boot-log> --duration 45 --wait 45`
+- [ ] `pio device monitor` used only after boot-banner capture, for interactive checks
 - [ ] Serial command set sent:
   - `help`
   - `status`

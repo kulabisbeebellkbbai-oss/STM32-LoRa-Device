@@ -16,6 +16,10 @@ struct RadioStatus {
   bool mocked{true};
   bool pinsConfigured{false};
   bool dxLr03CompileEnabled{false};
+  bool rfm69hCompileEnabled{false};
+  bool rfm69h868Profile{false};
+  bool rfm69h915Profile{false};
+  bool rfm69hSpiInitialized{false};
   bool serialInitialized{false};
   bool moduleInitAttempted{false};
   bool moduleProbePassed{false};
@@ -23,6 +27,8 @@ struct RadioStatus {
   bool atProbeAttempted{false};
   bool atProbePassed{false};
   uint32_t serialBaud{0};
+  uint32_t rfm69hFrequencyHz{0};
+  uint8_t rfm69hVersionRegister{0};
   unsigned long lastAtProbeMs{0};
   char lastAtResponse[32]{};
   char lastAtError[32]{};

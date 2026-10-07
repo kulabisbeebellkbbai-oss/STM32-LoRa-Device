@@ -9,9 +9,10 @@ flowchart LR
 
   subgraph SPI_Devices["SPI1 devices"]
     DISP["ST7789 Display"]
+    RFM69["RFM69H 868/915 option"]
   end
 
-  subgraph Radio["UART radio"]
+  subgraph Radio["Radio options"]
     LRM["DX-LR03-900T22D"]
   end
 
@@ -30,6 +31,7 @@ flowchart LR
   end
 
   SPI -->|SCK/MOSI| DISP
+  SPI -->|SCK/MOSI/MISO + CS| RFM69
   MCU -->|LPUART1 TX/RX + GPIO| LRM
   I2C -->|SCL/SDA| BMP
   I2C -->|SCL/SDA| ADX
@@ -42,6 +44,12 @@ flowchart LR
   LRM -.->|PB0| "M0"
   LRM -.->|PB1| "M1"
   LRM -.->|PA15| "AUX"
+  RFM69 -.->|PB3| "SCK"
+  RFM69 -.->|PA7| "MOSI"
+  RFM69 -.->|PA6| "MISO"
+  RFM69 -.->|PA15| "NSS/CS"
+  RFM69 -.->|PB0| "RESET"
+  RFM69 -.->|PB1| "DIO0"
 
   DISP -.->|PA4| "CS"
   DISP -.->|PB4| "DC"

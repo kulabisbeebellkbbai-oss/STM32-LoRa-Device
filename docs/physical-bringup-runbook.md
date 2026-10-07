@@ -58,11 +58,26 @@ pio run -t upload
 pio run -e stm32wb55_hardware_gates -t upload
 ```
 
-5. Open the USB CDC serial monitor in a second terminal:
+5. Open only one USB CDC reader at a time. For interactive checks after boot,
+   use the PlatformIO monitor:
 
 ```bash
 pio device monitor
 ```
+
+For reset-banner evidence, close `pio device monitor` first and use the
+wait-aware capture helper instead. It gives explicit no-port diagnostics and
+continues through short USB disconnect/re-enumeration windows during reset:
+
+```bash
+scripts/capture-boot-log.sh \
+  --output tests/results/usb-baseline/manual-reset-capture/boot.log \
+  --duration 45 \
+  --wait 45
+```
+
+Start the helper first, then press reset or replug the board when prompted. Do
+not run `pio device monitor` or another serial reader at the same time.
 
 6. Confirm serial command path:
 

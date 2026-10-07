@@ -57,7 +57,9 @@ constexpr bool kDisplayStubOnly = false;
 constexpr bool kDisplayStubOnly = true;
 #endif
 
-#if defined(LORA_RADIO_HARDWARE_ACTIVE) && defined(LORA_RADIO_DX_LR03_SERIAL) && !defined(RENODE_SIMULATION)
+#if defined(LORA_RADIO_HARDWARE_ACTIVE) && \
+    (defined(LORA_RADIO_DX_LR03_SERIAL) || defined(LORA_RADIO_RFM69H_SPI)) && \
+    !defined(RENODE_SIMULATION)
 constexpr bool kRadioHardwareAvailable = true;
 #else
 constexpr bool kRadioHardwareAvailable = false;

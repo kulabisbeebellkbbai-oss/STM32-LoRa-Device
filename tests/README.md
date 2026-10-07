@@ -27,6 +27,11 @@ Current expectations:
   `serialInitialized=yes`, but `moduleProbePassed` must remain `no` until
   `radio at` receives an `OK` response. Do not use UART initialization alone as
   online proof.
+- RFM69H radio status semantics: `stm32wb55_rfm69h_868` and
+  `stm32wb55_rfm69h_915` are guarded SPI bring-up profiles for the two inventory
+  modules. `rfm69hSpiInitialized=yes` only proves the MCU SPI scaffold opened;
+  `rfm69hVersion=0x24` proves the expected version register responded. Neither
+  is packet, receive, transmit, or regulatory proof.
 - USB command expectations are captured in `tests/usb-command-cases.tsv` and
   executed by `scripts/host-unit-tests.sh`. The `input_c_escape` column uses
   C-style escapes such as `\t` for tab-delimiter cases.
@@ -77,6 +82,8 @@ Use these commands for host-visible smoke planning and serial-device checks:
   (`tests/hardware-smoke-commands.tsv`) with no serial I/O.
 - `scripts/hardware-smoke.sh --discover` runs the serial command smoke and checks
   expected output substrings.
+- `scripts/hardware-smoke.sh --port <port> --commands tests/rfm69h-radio-commands.tsv`
+  checks the RFM69H profile diagnostics after flashing an RFM69H build.
 
 Results are written under:
 

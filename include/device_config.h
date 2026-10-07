@@ -23,6 +23,16 @@ struct PinConfig {
   static constexpr uint8_t kRadioSleepControl = PB1;  // DX-LR03 M1, high=wake
   static constexpr uint8_t kRadioAux = PA15;
 
+  // Alternative RFM69H SPI radio path. These pins are mutually exclusive with
+  // the DX-LR03 UART control pins and PA6 encoder switch in the first wiring
+  // plan; use only one radio family at a time.
+  static constexpr uint8_t kRfm69hSpiSck = PIN_SPI_SCK;
+  static constexpr uint8_t kRfm69hSpiMosi = PIN_SPI_MOSI;
+  static constexpr uint8_t kRfm69hSpiMiso = PIN_SPI_MISO;
+  static constexpr uint8_t kRfm69hChipSelect = PA15;
+  static constexpr uint8_t kRfm69hReset = PB0;
+  static constexpr uint8_t kRfm69hDio0 = PB1;
+
   static constexpr uint8_t kDisplaySpiSck = PIN_SPI_SCK;
   static constexpr uint8_t kDisplaySpiMosi = PA7;
   static constexpr uint8_t kDisplayCs = PA4;

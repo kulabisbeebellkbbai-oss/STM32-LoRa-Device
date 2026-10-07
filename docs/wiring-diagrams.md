@@ -21,6 +21,11 @@ flowchart LR
     Ant["900 MHz antenna (850-931 MHz band plan)"]
   end
 
+  subgraph AltRadio["Inventory SPI radio option"]
+    RFM69["RFM69H 868/915 MHz"]
+    RFM69Ant["Band-matched antenna"]
+  end
+
   subgraph Display["ST7789 LCD"]
     TFT["240x280 IPS"]
     BL["Backlight"]
@@ -45,6 +50,8 @@ flowchart LR
   GPIO --> DHT
   LPUART1 --> RFM
   RFM --> Ant
+  SPI1 --> RFM69
+  RFM69 --> RFM69Ant
   GPIO --> ENC
   GPIO --> BTN
   GPIO --> SW
@@ -55,7 +62,8 @@ flowchart LR
 ## Wiring Focus for this repository
 
 1. Start with bus integrity before signal-level features.
-2. Keep the display on SPI1 and move radio to the dedicated UART path.
+2. Keep the display on SPI1 and use the dedicated UART path for DX-LR03, or the
+   shared SPI1 path for one RFM69H module.
 3. Keep all module grounds tied to a single low-impedance point near the MCU.
 4. Add small-value local decoupling at each module: 10 µF + 0.1 µF per power pin.
 
@@ -63,7 +71,9 @@ flowchart LR
 
 Use this physical convention during first assembly:
 
-- Radio module VCC: stable 5 V rail, then 3.3 V logic on module pins.
+- Radio module VCC: stable 5 V rail for DX-LR03, then 3.3 V logic on module pins.
+- RFM69H module VCC: 3.3 V only; use a band-matched 868 MHz or 915 MHz antenna
+  before any RF field work.
 - All UART pins: short wires and no long stubs for first bring-up.
 - Shared buses on removable jumpers until first smoke stage passes.
 - Pull-ups:
@@ -94,6 +104,13 @@ Use this physical convention during first assembly:
     PB0 ----+---> DX-LR03 M0
     PB1 ----+---> DX-LR03 M1
     PA15 ---+<--- DX-LR03 AUX
+       OR, alternative inventory SPI radio:
+    PB3 ----+---> RFM69H SCK
+    PA7 ----+---> RFM69H MOSI
+    PA6 <---+---- RFM69H MISO
+    PA15 ---+---> RFM69H NSS/CS
+    PB0 ----+---> RFM69H RESET (active high)
+    PB1 <---+---- RFM69H DIO0
     PA0 ----+<--- Encoder A
     PA1 ----+<--- Encoder B
     PC13 <--+--- Back button / onboard user key
